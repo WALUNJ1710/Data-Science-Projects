@@ -1,0 +1,79 @@
+# Sarcasm Detection with Machine Learning
+Sarcasm means being funny by being the opposite of what you mean. It has been part of every human language for years. Today, it is also used in news headlines and various other social media platforms to gain more attention. Sarcasm detection is a natural language processing and binary classification task. We can train a machine learning model to detect whether or not a sentence is sarcastic using a dataset of sarcastic and non-sarcastic sentences that I found on Kaggle.
+I hope you now have understood what sarcasm is. In the section below, I’ll walk you through the task of detecting sarcasm with machine learning using the Python programming language. The dataset that I am using for this task can be downloaded from here.
+
+## Sarcasm Detection using Python
+Now let’s start with the task of sarcasm detection with machine learning using Python. I’ll start this task by importing the necessary Python libraries and the dataset:
+
+
+### Importing Libraries
+import pandas as pd
+import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import BernoulliNB
+
+
+### Loading dataset
+data = pd.read_json("Sarcasm.json", lines=True)
+print(data.head())
+
+### Output
+                                        article_link  ... is_sarcastic
+0  https://www.huffingtonpost.com/entry/versace-b...  ...            0
+1  https://www.huffingtonpost.com/entry/roseanne-...  ...            0
+2  https://local.theonion.com/mom-starting-to-fea...  ...            1
+3  https://politics.theonion.com/boehner-just-wan...  ...            1
+4  https://www.huffingtonpost.com/entry/jk-rowlin...  ...            0
+
+[5 rows x 3 columns]
+The “is_sarcastic” column in this dataset contains the labels that we have to predict for the task of sarcasm detection. It contains binary values as 1 and 0, where 1 means sarcastic and 0 means not sarcastic. So for simplicity, I will transform the values of this column as “sarcastic” and “not sarcastic” instead of 1 and 0:
+1
+data["is_sarcastic"] = data["is_sarcastic"].map({0: "Not Sarcasm", 1: "Sarcasm"})
+2
+print(data.head())
+                                        article_link  ... is_sarcastic
+0  https://www.huffingtonpost.com/entry/versace-b...  ...  Not Sarcasm
+1  https://www.huffingtonpost.com/entry/roseanne-...  ...  Not Sarcasm
+2  https://local.theonion.com/mom-starting-to-fea...  ...      Sarcasm
+3  https://politics.theonion.com/boehner-just-wan...  ...      Sarcasm
+4  https://www.huffingtonpost.com/entry/jk-rowlin...  ...  Not Sarcasm
+
+[5 rows x 3 columns]
+Now let’s prepare the data for training a machine learning model. This dataset has three columns, out of which we only need the “headline” column as a feature and the “is_sarcastic” column as a label. So let’s select these columns and split the data into 20% test set and 80% training set:
+
+
+
+data = data[["headline", "is_sarcastic"]]
+x = np.array(data["headline"])
+y = np.array(data["is_sarcastic"])
+
+cv = CountVectorizer()
+X = cv.fit_transform(x) # Fit the Data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
+view rawsarcasm detection2.py hosted with ❤ by GitHub
+Now I will be using the Bernoulli Naive Bayes algorithm to train a model for the task of sarcasm detection:
+
+1
+model = BernoulliNB()
+2
+model.fit(X_train, y_train)
+3
+print(model.score(X_test, y_test))
+0.8448146761512542
+Now let’s use a sarcastic text as input to test whether our machine learning model detects sarcasm or not:
+
+1
+user = input("Enter a Text: ")
+2
+data = cv.transform([user]).toarray()
+3
+output = model.predict(data)
+4
+print(output)
+Enter a Text: Cows lose their jobs as milk prices drop
+['Sarcasm']
+So this is how you can easily train a machine learning model for the task of sarcasm detection.
+
+Summary
+So this is how you can use machine learning to detect sarcasm by using the Python programming language. Sarcasm has been part of our language for many years. It means being the opposite of what you mean, usually with a distinct tone of voice in a fun way. I hope you liked this article on the task of sarcasm detection with machine learning using Python. Feel free to ask your valuable questions in the comments section below.
